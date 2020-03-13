@@ -1,0 +1,102 @@
+<html>
+
+<head>
+    <title>gasconnection</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<style>
+    .tablecss {
+        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .tablecss td,
+    .tablecss th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    .tablecss tr {
+        background-color: #f2f2f2;
+    }
+
+    .tablecss th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: center;
+        background-color: lavender;
+        color: black;
+        font-weight: bold;
+    }
+</style>
+<script>
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(JSON.parse(this.responseText));
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function loadData() {
+        const getPromise = performAjax("GET", "http://localhost:3344/Admin/hometax");
+        getPromise
+            .then((userList) => {
+                Hometaxes(userList);
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+    function Hometaxes(records) {
+        const tableHeader = `<tr><th style="text-align:center">Sno</th><th style="text-align:center">UserName</th><th style="height:20%;text-align:center">houseNo</th><th style="height:20%;text-align:center">houseRegNo</th><th style="height:20%;text-align:center">Squarefeets</th><th style="height:20%;text-align:center">tax</th><th style="height:20%;text-align:center">Actions</th></tr>`;
+        if (records.length > 0) {
+            let tableRows = records.map((user, index) => {
+                let GenerateBill = `<button type="button" class="btn btn-info "  style="color:blue; font-size:12px;" onclick="gerateBill('${user.id}','${user.userid}','${user.tax}')" data-toggle="modal" data-target="#myModal">GenerateBill</button>`;
+                return `<tr><td>${index + 1}</td><td>${user.user}</td><td>${user.houseNo}</td><td>${user.houseRegNo}</td><td>${user.Squarefeets}</td><td>${user.tax}</td><td align="center">${GenerateBill}&nbsp; </td></tr>`;
+            });
+            document.getElementById("table").innerHTML = `<table  border="2"> ${tableHeader}${tableRows.join('')}</table>`;
+        }
+        else {
+            tableRows = `<tr><td colspan="18" align="center">No Data Found</td></tr>`;
+            document.getElementById("table").innerHTML = `${tableHeader}${tableRows}`;
+        }
+    }
+
+    function gerateBill(id, userid, tax) {
+        sessionStorage.setItem("id", id)
+        sessionStorage.setItem('userid', userid)
+        window.location.href = "hometaxes"
+
+    }
+
+
+</script>
+
+<body onload="loadData()">
+    <center>
+        <h4>HomeTax</h4>
+        <table id=table border="1" class="tablecss" style="width: 50px;"></table>
+    </center>
+    <div class="container">
+</body>
+
+</html>

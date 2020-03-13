@@ -1,0 +1,177 @@
+<html>
+
+<head>
+    <title>profile</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<script>
+    const userName = sessionStorage.getItem('userName');
+    const userid = sessionStorage.getItem("userid");
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function Profile() {
+        document.getElementById("userName").value = userName;
+        const getrenterPromise = performAjax("GET", `http://localhost:3344/User/userProfile?userName=${userName}`);
+        getrenterPromise
+            .then((data) => {
+                const details = JSON.parse(data);
+                details.map(editRecord => {
+                    document.getElementById("userName").value = editRecord.userName;
+                    document.getElementById("fatherName").value = editRecord.fatherName;
+                    document.getElementById("email").value = editRecord.email;
+                    document.getElementById("phoneNo").value = editRecord.phoneNo;
+                    document.getElementById("adharNo").value = editRecord.adharNo;
+                    document.getElementById("occupation").value = editRecord.occupation;
+                    document.getElementById("annualIncome").value = editRecord.annualIncome;
+                    document.getElementById("country").value = editRecord.country;
+                    document.getElementById("state").value = editRecord.state;
+                    document.getElementById("district").value = editRecord.district;
+                    document.getElementById("mandal").value = editRecord.mandal;
+                    document.getElementById("village").value = editRecord.village;
+                    document.getElementById("houseNo").value = editRecord.houseNo;
+                    document.getElementById("pinCode").value = editRecord.pinCode;
+                });
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+    function UpdateProfile() {
+        const userName = document.getElementById("userName").value;
+        const fatherName = document.getElementById("fatherName").value;
+        const email = document.getElementById("email").value;
+        const phoneNo = document.getElementById("phoneNo").value;
+        const adharNo = document.getElementById("adharNo").value;
+        const occupation = document.getElementById("occupation").value;
+        const annualIncome = document.getElementById("annualIncome").value;
+        const state = document.getElementById("state").value;
+        const district = document.getElementById("district").value;
+        const mandal = document.getElementById("mandal").value;
+        const village = document.getElementById("village").value;
+        const houseNo = document.getElementById("houseNo").value;
+        const pinCode = document.getElementById("pinCode").value;
+        const getUpdatePromise = performAjax(
+            "PUT",
+            `http://localhost:3344/User/updateProfile/${userid}`,
+            JSON.stringify({ userName, fatherName, email, phoneNo, adharNo, occupation, annualIncome, state, district, mandal, village, houseNo, pinCode })
+        );
+        getUpdatePromise
+            .then((updatePromise) => {
+                alert('Details Updated');
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+
+</script>
+
+<body onload="Profile()" class="container-fluid"><br><br><br>
+    <center><h2>Profile</h2></center>
+    <form>
+        <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-2">UserName<input type="text" class="form-control" id="userName"></div>
+            <div class="col-sm-2">FatherName<input type="text" class="form-control" id="fatherName"></div>
+            <div class="col-sm-2">Email Id<input type="text" class="form-control" id="email"></div>
+            <div class="col-sm-2">PhoneNumber<input type="number" class="form-control" id="phoneNo"></div>
+            <div class="col-sm-2"></div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-2">AdharNumber<input type="number" class="form-control" id="adharNo"></div>
+            <div class="col-sm-2">Occupation <select name="" class="form-control" id="occupation">
+                    <option value="" selected="selected">--select--</option>
+                    <option value="job">job</option>
+                    <option value="cooli">cooli</option>
+                </select>
+            </div>
+
+            <div class="col-sm-2">AnnualIncome<input type="text" class="form-control" id="annualIncome"></div>
+            <div class="col-sm-2">Country<input type="text" class="form-control" id="country"></div>
+            <div class="col-sm-2"></div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-2">State
+                <select name="" id="state" class="form-control">
+                    <option value="" disabled="disabled" selected="selected">--select--</option>
+                    <option value="telangana">telangana</option>
+                    <option value="andhra pradesh">andhra pradesh</option>
+                </select>
+            </div>
+            <div class="col-sm-2">District
+                <select name="" id="district" class="form-control">
+                    <option value="" disabled="disabled" selected="selected">--select--</option>
+                    <option value="karimnagar">karimnagar</option>
+                    <option value="warangal">warangal</option>
+                    <option value="karnool">karnool</option>
+                    <option value="thirupathi">thirupathi</option>
+                </select>
+            </div>
+            <div class="col-sm-2">Mondal
+                <select name="" id="mandal" class="form-control">
+                    <option value="" disabled="disabled" selected="selected">--select--</option>
+                    <option value="Gangaram">Gangaram</option>
+                    <option value="srirampur">srirampur</option>
+                    <option value="dharmaram">dharmaram</option>
+                    <option value="sulthanabad">sulthanabad</option>
+                </select>
+            </div>
+            <div class="col-sm-2">Village
+                <select name="" id="village" class="form-control">
+                    <option value="" disabled="disabled" selected="selected">--select--</option>
+                    <option value="pegadapalli">pegadapalli</option>
+                    <option value="gangaraam">gangaraam</option>
+                    <option value="lalepalle">lalepalle</option>
+                    <option value="chakunta">chakunta</option>
+                </select>
+            </div>
+            <div class="col-sm-2"></div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-2">HouseNo<input type="text" class="form-control" id="houseNo"></div>
+            <div class="col-sm-2">Pincode<input type="number" class="form-control" id="pinCode"></div>
+            <div class="col-sm-4"></div>
+        </div><br><br><br>
+        <div class="row">
+            <div class="col-sm-5"></div>
+            <div class="col-sm-1">
+                <center><button type="button" onclick="UpdateProfile()" class="btn btn-primary">UpdateProfile</button>
+                </center>
+            </div>
+            <div class="col-sm-1">
+                <center><button type="button" onclick="cancel()" style="display: none;"
+                        class="btn btn-primary">Cancel</button></center>
+            </div>
+            <div class="col-sm-5"></div>
+        </div>
+    </form>
+</body>
+
+</html>

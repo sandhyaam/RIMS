@@ -1,0 +1,117 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+
+<script>
+    const userid = sessionStorage.getItem("userid");
+    const email = sessionStorage.getItem("email");
+    const tax = sessionStorage.getItem("tax");
+    const landid = sessionStorage.getItem("landid");
+    const homeid = sessionStorage.getItem("homeid");
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource Not Found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function loadData() {
+        document.getElementById("tax").value = tax;
+        const getrenterPromise = performAjax("GET", `http://localhost:3344/User/accountdetails?user=${userid}`);
+        getrenterPromise
+            .then((data) => {
+                const details = JSON.parse(data);
+                details.map(editRecord => {
+                    document.getElementById("id").value = editRecord._id;
+                    document.getElementById("accountHolder").value = editRecord.accountHolder;
+                    document.getElementById("accountNo").value = editRecord.accountNo;
+                    document.getElementById("amount").value = editRecord.amount;
+                });
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+
+    function payment() {
+        const id = document.getElementById("id").value;
+        const accountHolder = document.getElementById("accountHolder").value;
+        const accountNo = document.getElementById("accountNo").value;
+        const amount = document.getElementById("amount").value;
+        var totalAmount = amount - tax;
+        if (tax > totalAmount) {
+            alert('You have insufficient balance');
+        }
+        else {
+            const addPromise = performAjax(
+                "POST",
+                "http://localhost:3344/User/payments",
+                JSON.stringify({ account: id, landid, homeid, user: userid, email, accountHolder, accountNo, amount: totalAmount, tax }));
+            addPromise
+                .then(newList => {
+                    alert("Payment successfull")
+                })
+                .catch(err => {
+                    alert(err.message);
+                })
+
+        }
+    }
+
+</script>
+
+<body onload="loadData()" class="container-fluid"><br><br><br>
+    <form action=""><input type="hidden" disabled="false" id="id" class="form-control"></div>
+        <input type="hidden" disabled="false" id="amount" class="form-control"></div>
+        <div class="col-sm-4"></div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-2">accountHolder</div>
+            <div class="col-sm-2"><input type="text" disabled="false" id="accountHolder" class="form-control"></div>
+            <div class="col-sm-4"></div>
+        </div><br><br>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-2">accountNo</div>
+            <div class="col-sm-2"><input type="number" disabled="false" id="accountNo" class="form-control"></div>
+            <div class="col-sm-4"></div>
+        </div><br><br>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-2">Amount</div>
+            <div class="col-sm-2"><input type="number" disabled="false" id="tax" class="form-control"></div>
+            <div class="col-sm-4"></div>
+        </div><br><br><br>
+        <div class="row">
+            <div class="col-sm-5"></div>
+            <div class="col-sm-2">
+                <center><button type="button" onclick="payment()" class="btn btn-primary">Payment</button></center>
+            </div>
+            <div class="col-sm-5"></div>
+        </div>
+    </form>
+</body>
+
+</html>

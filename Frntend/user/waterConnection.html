@@ -1,0 +1,134 @@
+<html>
+
+<head>
+    <title>Waterconnection</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<style>
+    .tablecss {
+        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .tablecss td,
+    .tablecss th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    .tablecss tr {
+        background-color: #f2f2f2;
+    }
+
+    .tablecss th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: center;
+        background-color: lavender;
+        color: black;
+        font-weight: bold;
+    }
+</style>
+<script>
+    const userid = sessionStorage.getItem("userid");
+    const email = sessionStorage.getItem("email");
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(JSON.parse(this.responseText));
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function loadData() {
+        const getPromise = performAjax("GET", `http://localhost:3344/User/viewWater?user=${userid}`);
+        getPromise
+            .then((userList) => {
+                loadCurrentData(userList);
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+        const getrenterPromise = performAjax("GET", `http://localhost:3344/User/accountdetails?user=${userid}`);
+        getrenterPromise
+            .then((data) => {
+                const details = JSON.parse(JSON.stringify(data));
+                details.map(editRecord => {
+                    document.getElementById("accountid").value = editRecord._id;
+                    document.getElementById("amount").value = editRecord.amount;
+
+                });
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+    function loadCurrentData(records) {
+        const tableHeader = `<tr><th style="text-align:center">Sno</th><th style="text-align:center">Bill</th><th style="height:20%;text-align:center">RegistrationNo</th><th style="height:20%;text-align:center">Month</th><th style="height:20%;text-align:center">date</th><th style="height:20%;text-align:center">Status</th><th style="height:20%;text-align:center">Actions</th></tr>`;
+        if (records.length > 0) {
+            let tableRows = records.map((user, index) => {
+                let PaymentBill = `<button type="button" class="btn btn-info " id=""   style="color:blue; font-size:12px;" onclick="PaymentBill('${user.id}','${user.userid}','${user.bill}','${user.status}')" data-toggle="modal" data-target="#myModal">PaymentBill</button>`;
+                return `<tr><td>${index + 1}</td><td>${user.bill}</td><td>${user.RegistrationNo}</td><td>${user.month}</td><td>${user.date}</td><td>${user.status}</td><td align="center">${PaymentBill}&nbsp; </td></tr>`;
+            });
+            document.getElementById("table").innerHTML = `<table  border="2"> ${tableHeader}${tableRows.join('')}</table>`;
+        }
+        else {
+            tableRows = `<tr><td colspan="18" align="center">No Data Found</td></tr>`;
+            document.getElementById("table").innerHTML = `${tableHeader}${tableRows}`;
+        }
+    }
+    function PaymentBill(id, userid, bill, status) {
+        if (status == "Bill Generated") {
+            const accountid = document.getElementById("accountid").value;
+            document.getElementById("id").value = id
+            const getUpdatePromise = performAjax(
+                "PUT",
+                `http://localhost:3344/User/PaymentWaterBill/${id}`,
+                JSON.stringify({ account: accountid, email, id, bill, status: 'Paid' })
+            );
+            getUpdatePromise
+                .then((updatePromise) => {
+                    alert('Bill Paid Successfull');
+                    loadData(updatePromise);
+                })
+                .catch(err => {
+                    alert(err.message);
+                })
+        }
+        else {
+            alert("Already Paid your Bill");
+        }
+    }
+
+</script>
+
+<body onload="loadData()">
+    <input type="hidden" name="id" class="form-control" id="id">
+    <input type="hidden" name="id" class="form-control" id="accountid">
+
+    <input type="hidden" disabled="false" id="amount" class="form-control"></div>
+    <center>
+        <h4>WaterConnections</h4>
+        <table id=table border="1" class="tablecss" style="width: 50px;"></table>
+    </center>
+</body>
+
+</html>

@@ -1,0 +1,85 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<script>
+     const connectionid=sessionStorage.getItem("id");
+    const gasid = sessionStorage.getItem("gasid");
+    const RegistrationNo  = sessionStorage.getItem("RegistrationNo");
+    const month = sessionStorage.getItem("month");
+    const date = sessionStorage.getItem("date");
+    const status = sessionStorage.getItem("status");
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource Not Found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+    function geterateBill() {
+        const bill = document.getElementById("bill").value;
+        const status = "Bill Generated"
+        const addPromise = performAjax(
+            "POST",
+            "http://localhost:3344/Admin/addGasConnection",
+            JSON.stringify({ id:connectionid, user: gasid, bill,RegistrationNo,month,date,status }));
+        addPromise
+            .then(newList => {
+                alert('Registration Successfully Completed');
+                cancel();
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+
+
+
+    
+    function cancel() {
+        document.getElementById("bill").value = "";
+
+
+    }
+</script>
+
+<body class="container-fluid"><br><br><br>
+    <form action="">
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-2">Bill</div>
+            <div class="col-sm-2"><input type="text" id="bill" class="form-control"></div>
+            <div class="col-sm-4"></div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm-5"></div>
+            <div class="col-sm-2">
+                <center><button type="button" onclick="geterateBill()" class="btn btn-primary">Register</button>
+                </center>
+                <center><button type="button" style="display: none;" onclick="cancel()"
+                        class="btn btn-primary">cancel</button></center>
+            </div>
+            <div class="col-sm-5"></div>
+        </div>
+    </form>
+</body>
+
+</html>

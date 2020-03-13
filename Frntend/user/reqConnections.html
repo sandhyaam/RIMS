@@ -1,0 +1,142 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<script>
+    const userid = sessionStorage.getItem("userid");
+    const userName = sessionStorage.getItem("userName");
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource Not Found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+    function ReqConnections() {
+        const connectionType = document.getElementById("connectionType").value;
+        const RegNo = Math.floor((Math.random() * 1000) + 1);
+        const RegistrationNo = connectionType.concat(RegNo);
+        const userName = document.getElementById("userName").value;
+        const applyName = document.getElementById("applyName").value;
+        const phoneNo = document.getElementById("phoneNo").value;
+        const month = document.getElementById("month").value;
+        const date = document.getElementById("date").value;
+        const address = document.getElementById("address").value;
+        const status = "Due";
+        const addPromise = performAjax(
+            "POST",
+            "http://localhost:3344/User/reqConnection",
+            JSON.stringify({ user: userid, connectionType, RegistrationNo, userName, applyName, phoneNo, month, date, address, status }));
+        addPromise
+            .then(newList => {
+                alert('Registration Successfully Completed');
+                cancel();
+
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+    function cancel() {
+        document.getElementById("connectionType").value = "";
+        document.getElementById("applyName").value = "";
+        document.getElementById("phoneNo").value = "";
+        document.getElementById("date").value = "";
+        document.getElementById("address").value = "";
+    }
+    function usernames() {
+        document.getElementById("userName").value = userName;
+        var today = new Date();
+        var mm = String(today.getMonth() + 1).slice(-2);
+        var yyyy = today.getFullYear();
+        today = mm + '/' + yyyy;
+        document.getElementById("month").value = today;
+    }
+</script>
+
+<body onload="usernames()" class="container-fluid"><br>
+    <center><h2>Request Details</h2></center>&nbsp;&nbsp;
+    <form action="">
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-2">ConnectionType</div>
+            <div class="col-sm-2">
+                <select name="" id="connectionType" class="form-control">
+                    <option value="" disabled="disabled" selected="selected">--select--</option>
+                    <option value="Water">Water</option>
+                    <option value="Current">Current</option>
+                    <option value="Gas">Gas</option>
+                </select>
+            </div>
+            <div class="col-sm-4"></div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-2">UserName</div>
+            <div class="col-sm-2"><input type="text" disabled="false" id="userName" class="form-control"></div>
+            <div class="col-sm-4"></div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-2">ApplyerName</div>
+            <div class="col-sm-2">
+                <input type="text" id="applyName" class="form-control">
+            </div>
+            <div class="col-sm-4"></div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-2">MobileNumber</div>
+            <div class="col-sm-2"><input type="number" id="phoneNo" class="form-control"></div>
+            <div class="col-sm-4"></div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-2">Month</div>
+            <div class="col-sm-2"><input type="text" disabled="false" id="month" class="form-control"></div>
+            <div class="col-sm-4"></div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-2">Date</div>
+            <div class="col-sm-2"><input type="date" id="date" class="form-control"></div>
+            <div class="col-sm-4"></div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-2">Address</div>
+            <div class="col-sm-2"><textarea name="" id="address" class="form-control"></textarea></div>
+            <div class="col-sm-4"></div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm-5"></div>
+            <div class="col-sm-2">
+                <center><button type="button" onclick="ReqConnections()" class="btn btn-primary">Register</button>
+                </center>
+                <center><button type="button" onclick="cancel()" style="display: none;"
+                        class="btn btn-primary">cancel</button></center>
+            </div>
+            <div class="col-sm-5"></div>
+        </div>
+    </form>
+</body>
+
+</html>

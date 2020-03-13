@@ -1,0 +1,134 @@
+<html>
+
+<head>
+    <title>Admin</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .text {
+            color: white;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <div
+        style=" background: linear-gradient(to right, rgb(55, 81, 233), rgb(62, 138, 238));background-repeat: no-repeat;background-size: cover;">
+        <div class="container">
+            <nav class="mb-1 navbar navbar-expand-lg navbar-dark info-color" style="border-bottom: 1px solid white;">
+                <a class="navbar-brand" href="">
+                    <h2><img src="keralalogo.png" alt="" style="width: 100px;height: 70px"></h2>
+                </a>
+                <h6 class="text">Revenue Information &<br> Management System</h6>
+                <button class="navbar-toggler" type="button" data-toggle="collapse"
+                    data-target="#navbarSupportedContent-4" aria-controls="navbarSupportedContent-4"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent-4">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item active">
+                            <a class="text nav-link" href="http://localhost:3000/" target="iframe">Home</a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="text nav-link" href="http://localhost:3000/Admin/viewUser" target="iframe">View
+                                User</a>
+                        </li>
+                        <li class="nav-item dropdown active">
+                            <a class="text nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Tax
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <a class="dropdown-item" href="http://localhost:3000/Admin/viewHometax"
+                                    target="iframe">Home Tax</a>
+                                <a class="dropdown-item" href="http://localhost:3000/Admin/viewLandTax"
+                                    target="iframe">Land Tax</a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown active">
+                            <a class="text nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Connections
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <a class="dropdown-item" href="http://localhost:3000/Admin/GasConnection"
+                                    target="iframe">Gas</a>
+                                <a class="dropdown-item" href="http://localhost:3000/Admin/waterconnection"
+                                    target="iframe">Water</a>
+                                <a class="dropdown-item" href="http://localhost:3000/Admin/currentConnection"
+                                    target="iframe">Current</a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown active">
+                            <a class="text nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Reports
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <a class="dropdown-item" href="http://localhost:3000/Admin/viewGasReport"
+                                    target="iframe">Gas</a>
+                                <a class="dropdown-item" href="http://localhost:3000/Admin/viewWaterReport"
+                                    target="iframe">Water</a>
+                                <a class="dropdown-item" href="http://localhost:3000/Admin/viewCurrentReport"
+                                    target="iframe">Current</a>
+                                <a class="dropdown-item" href="http://localhost:3000/Admin/viewlandReport"
+                                    target="iframe">Land</a>
+                                <a class="dropdown-item" href="http://localhost:3000/Admin/viewhomeReport"
+                                    target="iframe">Home</a>
+                            </div>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="text nav-link" href="#userlogout" onclick="userlogout()" target="iframe"><i
+                                    class="fa fa-sign-out"></i>Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav><br>
+        </div>
+        <div id="userlogout">
+            <script>
+                function userlogout() {
+                    window.location.href = "/";
+                }
+            </script>
+        </div>
+
+    </div>
+    <div>
+        <iframe src="http://localhost:3000/adminhomepage" id="iframe" name="iframe" style="width: 100%;height:70%;border: none;margin-top: 20px;"></iframe>
+    </div>
+    <footer>
+        <div style="background-color: #ECF0F1;color: rgb(37, 59, 80);">
+            <div class="container"><br>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <h3>Menu's</h3>Home <br>About Us <br>Contact Us
+                    </div>
+                    <div class="col-sm-3">
+                        <h3>Apps</h3>ReLIS <br>E-Payment
+                    </div>
+                    <div class="col-sm-3">
+                        <h3>Others</h3>Terms of Use <br>Website Policies <br>Site map
+                    </div>
+                    <div class="col-sm-3">
+                        <a href=""><img src="map.jpg" alt="" style="width: 300px;height: 150px;"></a>
+                    </div>
+                </div><br>
+            </div><br>
+            <div style="text-align: center;color: rgb(37, 59, 80);">
+                <h5>© 2020 All Rights Reserved | Revenue Information & Management System</h5><br>
+            </div>
+        </div>
+
+    </footer>
+
+</body>
+
+</html>

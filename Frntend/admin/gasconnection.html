@@ -1,0 +1,102 @@
+<html>
+
+<head>
+    <title>gasconnection</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<style>
+    .tablecss {
+        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .tablecss td,
+    .tablecss th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    .tablecss tr {
+        background-color: #f2f2f2;
+    }
+
+    .tablecss th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: center;
+        background-color: lavender;
+        color: black;
+        font-weight: bold;
+    }
+</style>
+<script>
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(JSON.parse(this.responseText));
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function loadData() {
+        const getPromise = performAjax("GET", "http://localhost:3344/Admin/gasConnection");
+        getPromise
+            .then((userList) => {
+                loadGasData(userList);
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+    function loadGasData(records) {
+        const tableHeader = `<tr><th style="text-align:center">Sno</th><th style="height:20%;text-align:center">ConnectionType</th><th style="height:20%;text-align:center">RegistrationNo</th><th style="height:20%;text-align:center">userName</th><th style="height:20%;text-align:center">ApplyerName</th><th style="height:20%;text-align:center">phoneNo</th><th style="height:20%;text-align:center">Month</th><th style="height:20%;text-align:center">date</th><th style="height:20%;text-align:center">address</th><th style="height:20%;text-align:center">Status</th><th style="height:20%;text-align:center">Actions</th></tr>`;
+        if (records.length > 0) {
+            let tableRows = records.map((user, index) => {
+                let GenerateBill = `<button type="button" class="btn btn-info " id=""   style="color:blue; font-size:12px;" onclick="generateBill('${user.id}','${user.userid}','${user.RegistrationNo}','${user.month}','${user.date}','${user.status}')" data-toggle="modal" data-target="#myModal">GenerateBill</button>`;
+                return `<tr><td>${index + 1}</td><td>${user.connectionType}</td><td>${user.RegistrationNo}</td><td>${user.userName}</td><td>${user.applyName}</td><td>${user.phoneNo}</td><td>${user.month}</td><td>${user.date}</td><td>${user.address}</td><td>${user.status}</td><td align="center">${GenerateBill}&nbsp; </td></tr>`;
+            });
+            document.getElementById("table").innerHTML = `<table  border="2"> ${tableHeader}${tableRows.join('')}</table>`;
+        }
+        else {
+            tableRows = `<tr><td colspan="18" align="center">No Data Found</td></tr>`;
+            document.getElementById("table").innerHTML = `${tableHeader}${tableRows}`;
+        }
+    }
+
+    function generateBill(id, userid, RegistrationNo, month, date, status) {
+        sessionStorage.setItem("id", id);
+        sessionStorage.setItem("gasid", userid);
+        sessionStorage.setItem("RegistrationNo", RegistrationNo);
+        sessionStorage.setItem("month", month);
+        sessionStorage.setItem("date", date);
+        sessionStorage.setItem("status", status);
+        window.location.href = "gasDetails"
+    }
+</script>
+
+<body onload="loadData()">
+    <center>
+        <h4>gasconnection</h4>
+        <table id=table border="1" class="tablecss" style="width: 50px;"></table>
+    </center>
+</body>
+
+</html>

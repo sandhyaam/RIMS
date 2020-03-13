@@ -1,0 +1,165 @@
+<html>
+
+<head>
+    <title>registration form</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<script>
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+    function userRegistration() {
+        const userName = document.getElementById("userName").value;
+        const fatherName = document.getElementById("fatherName").value;
+        const email = document.getElementById("email").value;
+        const password = Math.floor((Math.random() * 1000) + 1);
+        const phoneNo = document.getElementById("phoneNo").value;
+        const adharNo = document.getElementById("adharNo").value;
+        const occupation = document.getElementById("occupation").value;
+        const annualIncome = document.getElementById("annualIncome").value;
+        const country = document.getElementById("country").value;
+        const state = document.getElementById("state").value;
+        const district = document.getElementById("district").value;
+        const mandal = document.getElementById("mandal").value;
+        const village = document.getElementById("village").value;
+        const houseNo = document.getElementById("houseNo").value;
+        const pinCode = document.getElementById("pinCode").value;
+        const status = "Pending";
+        const addPromise = performAjax(
+            "POST",
+            "http://localhost:3344/User/userRegistration",
+            JSON.stringify({ userName, fatherName, email, password, phoneNo, adharNo, occupation, annualIncome, country, state, district, mandal, village, houseNo, pinCode, status })
+        );
+        addPromise
+            .then(newList => {
+                alert('Registration Successfully Completed');
+                cancel();
+
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+    function cancel() {
+        userName = document.getElementById("userName").value = "";
+        fatherName = document.getElementById("fatherName").value = "";
+        email = document.getElementById("email").value = "";
+        phoneNo = document.getElementById("phoneNo").value = "";
+        adharNo = document.getElementById("adharNo").value = "";
+        occupation = document.getElementById("occupation").value = "";
+        annualIncome = document.getElementById("annualIncome").value = "";
+        state = document.getElementById("state").value = "";
+        district = document.getElementById("district").value = "";
+        mandal = document.getElementById("mandal").value = "";
+        village = document.getElementById("village").value = "";
+        houseNo = document.getElementById("houseNo").value = "";
+        pinCode = document.getElementById("pinCode").value = "";
+    }
+</script>
+
+<body class="container-fluid"><br><br><br>
+    <center><h4>User Registration</h4></center>
+    <form>
+        <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-2">UserName<input type="text" class="form-control" id="userName"></div>
+            <div class="col-sm-2">FatherName<input type="text" class="form-control" id="fatherName"></div>
+            <div class="col-sm-2">Email Id<input type="text" class="form-control" id="email"></div>
+            <div class="col-sm-2">PhoneNumber<input type="number" class="form-control" id="phoneNo"></div>
+            <div class="col-sm-2"></div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-2">AdharNumber<input type="number" class="form-control" id="adharNo"></div>
+            <div class="col-sm-2">Occupation <select name="" class="form-control" id="occupation">
+                    <option value="" selected="selected">--select--</option>
+                    <option value="job">job</option>
+                    <option value="cooli">cooli</option>
+                </select>
+            </div>
+
+            <div class="col-sm-2">AnnualIncome<input type="text" class="form-control" id="annualIncome"></div>
+            <div class="col-sm-2">Country<input type="text" class="form-control" id="country"></div>
+            <div class="col-sm-2"></div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-2">State
+                <select name="" id="state" class="form-control">
+                    <option value="" disabled="disabled" selected="selected">--select--</option>
+                    <option value="telangana">telangana</option>
+                    <option value="andhra pradesh">andhra pradesh</option>
+                </select>
+            </div>
+            <div class="col-sm-2">District
+                <select name="" id="district" class="form-control">
+                    <option value="" disabled="disabled" selected="selected">--select--</option>
+                    <option value="karimnagar">karimnagar</option>
+                    <option value="warangal">warangal</option>
+                    <option value="karnool">karnool</option>
+                    <option value="thirupathi">thirupathi</option>
+                </select>
+            </div>
+            <div class="col-sm-2">Mondal
+                <select name="" id="mandal" class="form-control">
+                    <option value="" disabled="disabled" selected="selected">--select--</option>
+                    <option value="Gangaram">Gangaram</option>
+                    <option value="srirampur">srirampur</option>
+                    <option value="dharmaram">dharmaram</option>
+                    <option value="sulthanabad">sulthanabad</option>
+                </select>
+            </div>
+            <div class="col-sm-2">Village
+                <select name="" id="village" class="form-control">
+                    <option value="" disabled="disabled" selected="selected">--select--</option>
+                    <option value="pegadapalli">pegadapalli</option>
+                    <option value="gangaraam">gangaraam</option>
+                    <option value="lalepalle">lalepalle</option>
+                    <option value="chakunta">chakunta</option>
+                </select>
+            </div>
+            <div class="col-sm-2"></div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-2">HouseNo<input type="text" class="form-control" id="houseNo"></div>
+            <div class="col-sm-2">Pincode<input type="number" class="form-control" id="pinCode"></div>
+            <div class="col-sm-4"></div>
+        </div><br><br><br>
+        <div class="row">
+            <div class="col-sm-5"></div>
+            <div class="col-sm-1">
+                <center><button type="button" onclick="userRegistration()" class="btn btn-primary">Register</button>
+                </center>
+            </div>
+            <div class="col-sm-1">
+                <center><button type="button" onclick="cancel()" style="display: none;"
+                        class="btn btn-primary">Cancel</button></center>
+            </div>
+            <div class="col-sm-5"></div>
+        </div>
+    </form>
+</body>
+
+</html>

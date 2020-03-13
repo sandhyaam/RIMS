@@ -1,0 +1,109 @@
+<html>
+
+<head>
+    <title>User login</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</head>
+<script>
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+
+                    resolve(this.responseText);
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function userLogin() {
+        const userName = document.getElementById("userName").value;
+        const password = document.getElementById("password").value;
+        const getLoginPromise = performAjax(
+            "GET",
+            `http://localhost:3344/User/userLogin?userName=${userName}&password=${password}`
+        );
+        getLoginPromise
+            .then((loginPromise) => {
+                if (loginPromise == "" || loginPromise == null) {
+                    alert('Login Faild');
+                }
+                else {
+                    const data = JSON.parse(loginPromise);
+                    const users = [data].map(record => {
+                        return record;
+                    });
+                    users.map(login => {
+                        sessionStorage.setItem("userid", login._id);
+                        sessionStorage.setItem("email", login.email);
+                        sessionStorage.setItem("userName", login.userName);
+                        window.top.location.href = "userPage";
+                    });
+                }
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+</script>
+
+<body class="container"><br>
+
+    <form>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4">
+                <center><img src="userlogin.jpg" alt=""></center>
+            </div>
+            <div class="col-sm-4"></div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-1">UserName</div>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="userName">
+            </div>
+            <div class="col-sm-4"></div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-1">Password</div>
+            <div class="col-sm-3">
+                <input type="password" class="form-control" id="password">
+            </div>
+            <div class="col-sm-4"></div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4">
+                <button type="button" class="btn btn-primary" onclick="userLogin()" style="width: 100%;">Login</button>
+            </div>
+            <div class="col-sm-4"></div>
+        </div><br>
+        <hr>
+        <div class="row">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-3" style="text-align: center;"><a href="http://localhost:3000/userRegistration">Register
+                    Here?</a></div>
+            <div class="col-sm-3" style="text-align: center;"><a href="http://localhost:3000/forgotpassword">Forget
+                    Password?</a></div>
+            <div class="col-sm-3"></div>
+        </div>
+    </form>
+</body>
+
+</html>

@@ -1,0 +1,229 @@
+<html>
+
+<head>
+    <title>viewuser</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<style>
+    .tablecss {
+        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .tablecss td,
+    .tablecss th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    .tablecss tr {
+        background-color: #f2f2f2;
+    }
+
+    .tablecss th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: center;
+        background-color: lavender;
+        color: black;
+        font-weight: bold;
+    }
+</style>
+<script>
+        function performAjax(httpMethod, url, params) {
+            const myPromise = new Promise((resolve, reject) => {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        resolve(JSON.parse(this.responseText));
+                    }
+                    if (this.status == 500) {
+                        reject({ error: true, message: "ServerError" });
+                    }
+                    if (this.status == 404) {
+                        reject({ error: true, message: "Resource not found" });
+                    }
+                };
+                xhttp.open(httpMethod, url, true);
+                xhttp.setRequestHeader("Content-Type", "application/json");
+                params ? xhttp.send(params) : xhttp.send();
+            });
+            return myPromise;
+        }
+    
+        function loadData() {
+            const getPromise = performAjax("GET", "http://localhost:3344/Admin/viewUsers");
+            getPromise
+                .then((userList) => {
+                    loadUserData(userList);
+                })
+                .catch(err => {
+                    alert(err.message);
+                })
+        }
+        function loadUserData(records) {
+            const tableHeader = `<tr><th style="text-align:center">Sno</th><th style="height:20%;text-align:center">UserName</th><th style="height:20%;text-align:center">FatherName</th><th style="height:20%;text-align:center">Email</th><th style="height:20%;text-align:center">PhoneNo</th><th style="height:20%;text-align:center">adharNo</th><th style="height:20%;text-align:center">occupation</th><th style="height:20%;text-align:center">annualIncome</th><th style="height:20%;text-align:center">Country</th><th style="height:20%;text-align:center">state</th><th style="height:20%;text-align:center">district</th><th style="height:20%;text-align:center">mandal</th><th style="height:20%;text-align:center">village</th><th style="height:20%;text-align:center">houseNo</th><th style="height:20%;text-align:center">PinCode</th><th style="height:20%;text-align:center">Status</th><th style="height:20%;text-align:center">Actions</th></tr>`;
+            if (records.length > 0) {
+                let tableRows = records.map((user, index) => {
+                    let editButton = `<a class="fa fa-edit" id="${user._id}"   style="color:blue; font-size:22px;" onclick="editRecords(event)" data-toggle="modal" data-target="#myModal"></a>`;
+                    return `<tr><td>${index + 1}</td><td>${user.userName}</td><td>${user.fatherName}</td><td>${user.email}</td><td>${user.phoneNo}</td><td>${user.adharNo}</td><td>${user.occupation}</td><td>${user.annualIncome}</td><td>${user.country}</td><td>${user.state}</td><td>${user.district}</td><td>${user.mandal}</td><td>${user.village}</td><td>${user.houseNo}</td><td>${user.pinCode}</td><td>${user.status}</td><td>&nbsp;${editButton}&nbsp;</td></tr>`;
+                });
+                document.getElementById("table").innerHTML = `<table  border="2"> ${tableHeader}${tableRows.join('')}</table>`;
+            }
+            else {
+                tableRows = `<tr><td colspan="18" align="center">No Data Found</td></tr>`;
+                document.getElementById("table").innerHTML = `${tableHeader}${tableRows}`;
+            }
+        }
+        function editRecords(event) {
+            event.preventDefault();
+            const getPromise = performAjax("GET", `http://localhost:3344/Admin/editUsersData/${event.target.id}`);
+            getPromise
+                .then((data) => {
+                    const users = JSON.parse(JSON.stringify(data));
+                    [users].map(editRecord => {
+                        document.getElementById("id").value = editRecord._id;
+                        document.getElementById("userName").value = editRecord.userName;
+                        document.getElementById("fatherName").value = editRecord.fatherName;
+                        document.getElementById("email").value = editRecord.email;
+                        document.getElementById("phoneNo").value = editRecord.phoneNo;
+                        document.getElementById("adharNo").value = editRecord.adharNo;
+                        document.getElementById("occupation").value = editRecord.occupation;
+                        document.getElementById("annualIncome").value = editRecord.annualIncome;
+                        document.getElementById("country").value = editRecord.country;
+                        document.getElementById("state").value = editRecord.state;
+                        document.getElementById("district").value = editRecord.district;
+                        document.getElementById("mandal").value = editRecord.mandal;
+                        document.getElementById("village").value = editRecord.village;
+                        document.getElementById("houseNo").value = editRecord.houseNo;
+                        document.getElementById("pinCode").value = editRecord.pinCode;
+                        document.getElementById("de-active").checked = editRecord.de-active;
+                    })
+                       
+                })
+                .catch(err => {
+                            alert(err.message);
+                        })
+        }
+    
+        function UserUpdate() {
+            const id = document.getElementById("id").value;
+            const status = document.getElementById("de-active").checked ? "De-Active" : "Active";
+            const getPromise = performAjax(
+                "PUT",
+                `http://localhost:3344/Admin/updateUser/${id}`,
+                JSON.stringify({  status })
+            );
+            getPromise
+                .then((Promise) => {
+                    alert('Update Successfully');
+                    loadData();
+                   
+                })
+                .catch(err => {
+                    alert(err.message);
+                })
+        }
+    </script>
+    
+    
+<body onload="loadData()">
+        <center>
+            <h4>Users</h4>
+            <table id="table" class="tablecss" ></table>
+        </center>
+        <div class="container">
+                <div class="modal fade" id="myModal" role="dialog">
+                  <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                            <h4 class="modal-title">User Details</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      </div>
+                      <div class="modal-body">
+                            <input type="hidden" name="id" id="id" class="form-control" required>
+                        <div class="row">
+                      <div class="col-sm-2"></div>
+                      <div class="col-sm-2">UserName<input type="text" disabled="false" class="form-control" id="userName"></div>
+                      <div class="col-sm-2">FatherName<input type="text" disabled="false" class="form-control" id="fatherName"></div>
+                      <div class="col-sm-2">Email Id<input type="text" disabled="false" class="form-control" id="email"></div>
+                      <div class="col-sm-2">PhoneNumber<input type="number" disabled="false" class="form-control" id="phoneNo"></div>
+                      <div class="col-sm-2"></div>
+                  </div><br>
+                  <div class="row">
+                      <div class="col-sm-2"></div>
+                      <div class="col-sm-2">AdharNumber<input disabled="false" type="number" class="form-control" id="adharNo"></div>
+                      <div class="col-sm-2">Occupation <select name=""  disabled="false" class="form-control" id="occupation">
+                          <option value="" selected="selected">--select--</option>
+                          <option value="job">job</option>
+                          <option value="cooli">cooli</option>
+                      </select>
+                  </div>
+              
+                  <div class="col-sm-2">AnnualIncome<input disabled="false" type="text" class="form-control" id="annualIncome"></div>
+                  <div class="col-sm-2">Country<input type="text" class="form-control" id="country"></div>
+                      <div class="col-sm-2"></div>
+                  </div><br>
+                  <div class="row">
+                      <div class="col-sm-2"></div>
+                      <div class="col-sm-2">State
+                          <select name="" id="state" class="form-control">
+                              <option value="" disabled="false" disabled="false" selected="selected">--select--</option>
+                              <option value="telangana">telangana</option>
+                              <option value="andhra pradesh">andhra pradesh</option>
+                          </select>
+                      </div>
+                      <div class="col-sm-2">District
+                          <select name="" id="district" class="form-control">
+                              <option value="" disabled="false" selected="selected">--select--</option>
+                              <option value="karimnagar">karimnagar</option>
+                              <option value="warangal">warangal</option>
+                              <option value="karnool">karnool</option>
+                              <option value="thirupathi">thirupathi</option>
+                          </select>
+                      </div>
+                      <div class="col-sm-2">Mondal
+                              <select name="" disabled="false" id="mandal" class="form-control">
+                                  <option value=""disabled="false" selected="selected">--select--</option>
+                                  <option value="Gangaram">Gangaram</option>
+                                  <option value="srirampur">srirampur</option>
+                                  <option value="dharmaram">dharmaram</option>
+                                  <option value="sulthanabad">sulthanabad</option>
+                              </select>
+                          </div>
+                          <div class="col-sm-2">Village
+                              <select name="" id="village" disabled="false" class="form-control">
+                                  <option value="" disabled="disabled" selected="selected">--select--</option>
+                                  <option value="pegadapalli">pegadapalli</option>
+                                  <option value="gangaraam">gangaraam</option>
+                                  <option value="lalepalle">lalepalle</option>
+                                  <option value="chakunta">chakunta</option>
+                              </select>
+                          </div>
+                      <div class="col-sm-2"></div>
+                  </div><br>
+                  <div class="row">
+                      <div class="col-sm-4"></div>
+                      <div class="col-sm-2">HouseNo<input disabled="false" type="text" class="form-control" id="houseNo"></div>
+                      <div class="col-sm-2">Pincode<input disabled="false" type="number" class="form-control" id="pinCode"></div>
+                      <div class="col-sm-4">Status<br><input type="radio" name="status" id="active" value="Active" required>Active
+                        <input type="radio" name="status" id="de-active" value="De-Active" required>De-Active</div>
+                     
+                  </div><br><br><br>
+                  <div class="row">
+                      <div class="col-sm-5"></div>
+                      <div class="col-sm-1"><center><button data-dismiss="modal"  type="button" onclick="UserUpdate()" class="btn btn-primary">Update</button></center></div>
+                      <div class="col-sm-1"><center><button type="button" onclick="cancel()" style="display: none;" class="btn btn-primary">Cancel</button></center></div>
+                      <div class="col-sm-5"></div>
+                  </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+    </body>
+</html>
